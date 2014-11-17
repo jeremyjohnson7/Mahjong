@@ -1,6 +1,6 @@
 /*Jeremy Johnson
  *CS 3230 - TR 9:30 AM
- *Lab 5: WhiteDragonTile.java
+ *Lab 7: WhiteDragonTile.java
  */
 
 import java.awt.*;
@@ -23,10 +23,10 @@ public class WhiteDragonTile extends Tile{
       g.fillRect(x + 56, y + 8, 8, 8);
       
       //Bottom
-      g.fillRect(x + 8, y + height - 16, 8, 8);
-      g.fillRect(x + 24, y + height - 16, 8, 8);
-      g.fillRect(x + 40, y + height - 16, 8, 8);
-      g.fillRect(x + 56, y + height - 16, 8, 8);
+      g.fillRect(x + 8, y + HEIGHT - 16, 8, 8);
+      g.fillRect(x + 24, y + HEIGHT - 16, 8, 8);
+      g.fillRect(x + 40, y + HEIGHT - 16, 8, 8);
+      g.fillRect(x + 56, y + HEIGHT - 16, 8, 8);
       
       //Left
       g.fillRect(x + 8, y + 23, 8, 8);
@@ -34,18 +34,18 @@ public class WhiteDragonTile extends Tile{
       g.fillRect(x + 8, y + 53, 8, 8);
       
       //Right
-      g.fillRect(x + width - 16, y + 23, 8, 8);
-      g.fillRect(x + width - 16, y + 38, 8, 8);
-      g.fillRect(x + width - 16, y + 53, 8, 8);
+      g.fillRect(x + WIDTH - 16, y + 23, 8, 8);
+      g.fillRect(x + WIDTH - 16, y + 38, 8, 8);
+      g.fillRect(x + WIDTH - 16, y + 53, 8, 8);
       
       //Lines
-      g.drawRect(x + 8, y + 8, width - 16, height - 16);
-      g.drawRect(x + 16, y + 16, width - 32, height - 32);
-      g.drawRect(x + 12, y + 12, width - 24, height - 24);
+      g.drawRect(x + 8, y + 8, WIDTH - 16, HEIGHT - 16);
+      g.drawRect(x + 16, y + 16, WIDTH - 32, HEIGHT - 32);
+      g.drawRect(x + 12, y + 12, WIDTH - 24, HEIGHT - 24);
       
       g.setColor(Color.WHITE);
-      g.drawRect(x + 10, y + 10, width - 20, height - 20);
-      g.drawRect(x + 14, y + 14, width - 28, height - 28);
+      g.drawRect(x + 10, y + 10, WIDTH - 20, HEIGHT - 20);
+      g.drawRect(x + 14, y + 14, WIDTH - 28, HEIGHT - 28);
    }
    
    public String toString(){

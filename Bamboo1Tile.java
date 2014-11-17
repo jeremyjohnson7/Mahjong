@@ -1,6 +1,6 @@
 /*Jeremy Johnson
  *CS 3230 - TR 9:30 AM
- *Lab 5: Bamboo1Tile.java
+ *Lab 7: Bamboo1Tile.java
  */
 
 import java.awt.*;

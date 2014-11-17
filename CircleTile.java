@@ -1,6 +1,6 @@
 /*Jeremy Johnson
  *CS 3230 - TR 9:30 AM
- *Lab 5: CircleTile.java
+ *Lab 7: CircleTile.java
  */
 
 import java.awt.*;

@@ -1,6 +1,6 @@
 /*Jeremy Johnson
  *CS 3230 - TR 9:30 AM
- *Lab 5: FlowerTile.java
+ *Lab 7: FlowerTile.java
  */
 
 import java.awt.*;

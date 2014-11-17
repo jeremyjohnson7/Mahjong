@@ -1,6 +1,6 @@
 /*Jeremy Johnson
  *CS 3230 - TR 9:30 AM
- *Lab 5: CharacterTile.java
+ *Lab 7: CharacterTile.java
  */
 
 import java.awt.*;
@@ -40,7 +40,7 @@ public class CharacterTile extends Tile{
       
       FontMetrics fm = g.getFontMetrics();
       g.setColor(RED);
-      g.drawString("" + symbol, x + width - fm.stringWidth("" + symbol) - 4, y + 16);
+      g.drawString("" + symbol, x + WIDTH - fm.stringWidth("" + symbol) - 4, y + 16);
       
       g.setFont(new Font("serif", Font.BOLD, 48));
       fm = g.getFontMetrics();
@@ -50,24 +50,24 @@ public class CharacterTile extends Tile{
             g.setFont(new Font("serif", Font.BOLD, 32));
             fm = g.getFontMetrics();
             g.setColor(Color.BLACK);
-            g.drawString(CharacterTile.charmap.get(symbol), x + (width - fm.stringWidth(CharacterTile.charmap.get(symbol))) / 2, y + 32);
+            g.drawString(CharacterTile.charmap.get(symbol), x + (WIDTH - fm.stringWidth(CharacterTile.charmap.get(symbol))) / 2, y + 32);
             g.setColor(RED);
-            g.drawString("\u842c", x + (width - fm.stringWidth(CharacterTile.charmap.get(symbol))) / 2, y + 70);
+            g.drawString("\u842c", x + (WIDTH - fm.stringWidth(CharacterTile.charmap.get(symbol))) / 2, y + 70);
             break;
             
          case 'N': case 'E': case 'W': case 'S':
             g.setColor(Color.BLACK);
-            g.drawString(CharacterTile.charmap.get(symbol), x + (width - fm.stringWidth(CharacterTile.charmap.get(symbol))) / 2, y + 58);
+            g.drawString(CharacterTile.charmap.get(symbol), x + (WIDTH - fm.stringWidth(CharacterTile.charmap.get(symbol))) / 2, y + 58);
             break;
             
          case 'C':
             g.setColor(RED);
-            g.drawString(CharacterTile.charmap.get(symbol), x + (width - fm.stringWidth(CharacterTile.charmap.get(symbol))) / 2, y + 58);
+            g.drawString(CharacterTile.charmap.get(symbol), x + (WIDTH - fm.stringWidth(CharacterTile.charmap.get(symbol))) / 2, y + 58);
             break;
             
          case 'F':
             g.setColor(GREEN);
-            g.drawString(CharacterTile.charmap.get(symbol), x + (width - fm.stringWidth(CharacterTile.charmap.get(symbol))) / 2, y + 58);
+            g.drawString(CharacterTile.charmap.get(symbol), x + (WIDTH - fm.stringWidth(CharacterTile.charmap.get(symbol))) / 2, y + 58);
             break;
       }
    }

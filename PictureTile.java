@@ -1,6 +1,6 @@
 /*Jeremy Johnson
  *CS 3230 - TR 9:30 AM
- *Lab 5: PictureTile.java
+ *Lab 7: PictureTile.java
  */
 
 import java.awt.*;
@@ -11,17 +11,12 @@ import javax.swing.*;
 
 public abstract class PictureTile extends Tile{
    private String name;
-   private BufferedImage img;
+   private Image img;
    
    public PictureTile(String name){
       this.name = name;
       setToolTipText(toString());
-      
-      try{
-         img = ImageIO.read(new File("./images/" + name + ".png"));
-      }catch(Exception ex){
-         ex.printStackTrace();
-      }
+      img = new ImageIcon(getClass().getResource("images/" + name + ".png")).getImage();
    }
    
    public String toString(){
@@ -31,7 +26,7 @@ public abstract class PictureTile extends Tile{
    public void paintComponent(Graphics g){
       super.paintComponent(g);
       
-      g.drawImage(img, x + (width - img.getWidth()) / 2, y + (height - img.getHeight()) / 2, null);
+      g.drawImage(img, x + (WIDTH - img.getWidth(null)) / 2, y + (HEIGHT - img.getHeight(null)) / 2, null);
    }
    
    public static void main(String[] args){
