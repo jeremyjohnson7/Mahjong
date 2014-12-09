@@ -1,6 +1,6 @@
 /*Jeremy Johnson
  *CS 3230 - TR 9:30 AM
- *Lab 7: Shadow.java
+ *Lab 8: Shadow.java
  */
 
 import java.awt.*;

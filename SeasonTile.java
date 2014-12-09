@@ -1,6 +1,6 @@
 /*Jeremy Johnson
  *CS 3230 - TR 9:30 AM
- *Lab 7: SeasonTile.java
+ *Lab 8: SeasonTile.java
  */
 
 import java.awt.*;

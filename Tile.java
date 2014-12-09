@@ -1,6 +1,6 @@
 /*Jeremy Johnson
  *CS 3230 - TR 9:30 AM
- *Lab 7: Tile.java
+ *Lab 8: Tile.java
  */
 
 import java.awt.*;
@@ -10,10 +10,10 @@ import javax.swing.*;
 public abstract class Tile extends JPanel /*implements MouseListener*/{
    public static final int WIDTH = 72, HEIGHT = 84, DEPTH = 16;
    
-   protected final Color RED = new Color(192, 0, 0);
-   protected final Color GREEN = new Color(0, 192, 0);
-   protected final Color BLUE = new Color(0, 0, 192);
-   protected final Color WHITE = new Color(232, 232, 232);
+   protected final static Color RED = new Color(192, 0, 0);
+   protected final static Color GREEN = new Color(0, 192, 0);
+   protected final static Color BLUE = new Color(0, 0, 192);
+   protected final static Color WHITE = new Color(232, 232, 232);
    
    protected final int x = 0, y = 16;//, width = 72, height = 84;
    private Block front, back, selectedFront, highlightedFront;
@@ -22,6 +22,63 @@ public abstract class Tile extends JPanel /*implements MouseListener*/{
    public Tile up, nw, sw, ne, se;
    private boolean selected, highlighted;
    protected Shadow shadow = null;
+   
+   public static Tile copy(Tile t){
+      switch(t.toString()){
+         case "Character 1": return new CharacterTile('1');
+         case "Character 2": return new CharacterTile('2');
+         case "Character 3": return new CharacterTile('3');
+         case "Character 4": return new CharacterTile('4');
+         case "Character 5": return new CharacterTile('5');
+         case "Character 6": return new CharacterTile('6');
+         case "Character 7": return new CharacterTile('7');
+         case "Character 8": return new CharacterTile('8');
+         case "Character 9": return new CharacterTile('9');
+         
+         case "Circle 1": return new CircleTile(1);
+         case "Circle 2": return new CircleTile(2);
+         case "Circle 3": return new CircleTile(3);
+         case "Circle 4": return new CircleTile(4);
+         case "Circle 5": return new CircleTile(5);
+         case "Circle 6": return new CircleTile(6);
+         case "Circle 7": return new CircleTile(7);
+         case "Circle 8": return new CircleTile(8);
+         case "Circle 9": return new CircleTile(9);
+         
+         case "Bamboo 1": return new Bamboo1Tile();
+         case "Bamboo 2": return new BambooTile(2);
+         case "Bamboo 3": return new BambooTile(3);
+         case "Bamboo 4": return new BambooTile(4);
+         case "Bamboo 5": return new BambooTile(5);
+         case "Bamboo 6": return new BambooTile(6);
+         case "Bamboo 7": return new BambooTile(7);
+         case "Bamboo 8": return new BambooTile(8);
+         case "Bamboo 9": return new BambooTile(9);
+         
+         case "North Wind": return new CharacterTile('N');
+         case "East Wind": return new CharacterTile('E');
+         case "West Wind": return new CharacterTile('W');
+         case "South Wind": return new CharacterTile('S');
+         
+         case "Red Dragon": return new CharacterTile('C');
+         case "Green Dragon": return new CharacterTile('F');
+         case "White Dragon": return new WhiteDragonTile();
+         
+         case "Chrysanthemum": return new FlowerTile("Chrysanthemum");
+         case "Orchid": return new FlowerTile("Orchid");
+         case "Plum": return new FlowerTile("Plum");
+         case "Bamboo": return new FlowerTile("Bamboo");
+         
+         case "Spring": return new SeasonTile("Spring");
+         case "Summer": return new SeasonTile("Summer");
+         case "Fall": return new SeasonTile("Fall");
+         case "Winter": return new SeasonTile("Winter");
+         
+         default: return new CircleTile(1);
+      }
+      
+      //return null;
+   }
    
    public Tile(){
       setToolTipText(toString());

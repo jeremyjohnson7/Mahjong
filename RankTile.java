@@ -1,6 +1,6 @@
 /*Jeremy Johnson
  *CS 3230 - TR 9:30 AM
- *Lab 7: RankTile.java
+ *Lab 8: RankTile.java
  */
 
 import java.awt.*;

@@ -1,6 +1,6 @@
 /*Jeremy Johnson
  *CS 3230 - TR 9:30 AM
- *Lab 7: CharacterTile.java
+ *Lab 8: CharacterTile.java
  */
 
 import java.awt.*;

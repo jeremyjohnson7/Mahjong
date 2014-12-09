@@ -1,6 +1,6 @@
 /*Jeremy Johnson
  *CS 3230 - TR 9:30 AM
- *Lab 7: BambooTile.java
+ *Lab 8: BambooTile.java
  */
 
 import java.awt.*;
@@ -158,7 +158,7 @@ public class BambooTile extends RankTile{
          
          //Highlight
          g2d.setColor(Color.WHITE);
-         g2d.drawLine(x + 4, y + 0, x + 4, y + 24);
+         g2d.drawLine(x + 4, y + 2, x + 4, y + 22);
          
          //Knobs
          g2d.setColor(color);

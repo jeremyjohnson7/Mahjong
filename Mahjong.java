@@ -1,6 +1,6 @@
 /*Jeremy Johnson
  *CS 3230 - TR 9:30 AM
- *Lab 7: Mahjong.java
+ *Lab 8: Mahjong.java
  */
 
 import java.awt.*;
@@ -10,17 +10,32 @@ import javax.swing.*;
 
 public class Mahjong extends JFrame{
    private Tile selected = null;
-   private boolean debug = true, tournament = false, sound = true;
+   private boolean debug = false, tournament = false, sound = true, fireworks = false;
    protected JMenuBar menuBar = new JMenuBar();
    protected MahjongPanel mahjongPanel = new MahjongPanel();
-   protected JMenuItem undoMI, redoMI, soundMI;
+   ///protected HistoryPanel historyPanel = new HistoryPanel();
+   protected JMenu moveMenu, debugMenu;
+   protected JMenuItem undoMI, redoMI, soundMI, restartMI, numberedMI;
    protected Random rand = new Random();
    
+   public Mahjong(boolean debug){
+      this();
+      debugMenu.setVisible(debug);
+   }
+   
    public Mahjong(){
-      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
       setTitle("Mahjong");
+      setIconImage(CircleTile.createIcon());
+      
+      addWindowListener(new WindowAdapter(){
+         public void windowClosing(WindowEvent e){
+            exit();
+         }
+      });
       
       add(mahjongPanel);
+      ///add(historyPanel, BorderLayout.EAST);
       
       //Menu bar setup
       JMenu m;
@@ -30,12 +45,17 @@ public class Mahjong extends JFrame{
       m = new JMenu("Game");
       m.setMnemonic(KeyEvent.VK_G);
       
-      mi = new JMenuItem("Play");
+      mi = new JMenuItem("New Game");
       mi.setToolTipText("Play a new game");
-      mi.setMnemonic(KeyEvent.VK_P);
+      mi.setMnemonic(KeyEvent.VK_G);
       mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
       mi.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
+            if(mahjongPanel.hasMatch() && JOptionPane.showConfirmDialog(mahjongPanel,
+                  "The current game will be discarded.\nAre you sure you want to continue?",
+                  "New Game", JOptionPane.YES_NO_OPTION) != JOptionPane.OK_OPTION)
+               return;
+            
             mahjongPanel.newGame();
          }
       });
@@ -50,7 +70,7 @@ public class Mahjong extends JFrame{
             mahjongPanel.newSolvableGame();
          }
       });
-      m.add(mi);*/
+      m.add(mi);/**/
       
       mi = new JMenuItem("Restart");
       mi.setToolTipText("Start this game over");
@@ -58,9 +78,15 @@ public class Mahjong extends JFrame{
       mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.CTRL_MASK));
       mi.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
+            if(mahjongPanel.hasMatch() && mahjongPanel.getScore() != 0 && JOptionPane.showConfirmDialog(mahjongPanel,
+                  "This operation cannot be undone.\nAre you sure you want to continue?",
+                  "Restart", JOptionPane.YES_NO_OPTION) != JOptionPane.OK_OPTION)
+               return;
+            
             mahjongPanel.startOver();
          }
       });
+      restartMI = mi;
       m.add(mi);
       
       m.addSeparator();
@@ -74,18 +100,45 @@ public class Mahjong extends JFrame{
             mahjongPanel.newNumberedGame();
          }
       });
+      numberedMI = mi;
       m.add(mi);
       
-      mi = new JMenuItem("Tournament");
+      mi = new JCheckBoxMenuItem("Tournament");
       mi.setToolTipText("Play in tournament mode");
       mi.setMnemonic(KeyEvent.VK_T);
       mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, ActionEvent.CTRL_MASK));
+      final JMenuItem h = mi;
       mi.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
-            //mahjongPanel.startOver();
+            if(mahjongPanel.hasMatch() && JOptionPane.showConfirmDialog(mahjongPanel,
+                  "The current game will be discarded.\nAre you sure you want to continue?",
+                  "New Game", JOptionPane.YES_NO_OPTION) != JOptionPane.OK_OPTION){
+               h.setSelected(tournament);
+               return;
+            }
+            
+            tournament = !tournament;
+            setTitle(tournament ? "Mahjong Tournament" : "Mahjong");
+            moveMenu.setEnabled(!tournament);
+            restartMI.setEnabled(!tournament);
+            numberedMI.setEnabled(!tournament);
+            mahjongPanel.newGame();
          }
       });
-      mi.setEnabled(false);
+      //mi.setEnabled(false);
+      m.add(mi);
+      
+      m.addSeparator();
+      
+      mi = new JMenuItem("Quit");
+      mi.setToolTipText("Quit the game");
+      mi.setMnemonic(KeyEvent.VK_Q);
+      mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, ActionEvent.CTRL_MASK));
+      mi.addActionListener(new ActionListener(){
+         public void actionPerformed(ActionEvent e){
+            exit();
+         }
+      });
       m.add(mi);
       
       menuBar.add(m);
@@ -94,18 +147,19 @@ public class Mahjong extends JFrame{
       m = new JMenu("Sound");
       m.setMnemonic(KeyEvent.VK_S);
       
-      mi = new JMenuItem(sound ? "On" : "Off");
+      mi = new JMenuItem(!sound ? "On" : "Off");
       soundMI = mi;
       mi.setToolTipText("Turn the sound on or off");
       mi.setMnemonic(KeyEvent.VK_O);
-      mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0));
+      mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F7, 0));
       mi.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
             sound = !sound;
-            soundMI.setText(sound ? "On" : "Off");
+            mahjongPanel.setSound(sound);
+            soundMI.setText(!sound ? "On" : "Off");
          }
       });
-      mi.setEnabled(false);
+      //mi.setEnabled(false);
       m.add(mi);
       
       menuBar.add(m);
@@ -113,6 +167,7 @@ public class Mahjong extends JFrame{
       //Move menu
       m = new JMenu("Move");
       m.setMnemonic(KeyEvent.VK_M);
+      moveMenu = m;
       
       mi = new JMenuItem("Undo");
       mi.setToolTipText("Undo the last move");
@@ -130,7 +185,7 @@ public class Mahjong extends JFrame{
       mi = new JMenuItem("Redo");
       mi.setToolTipText("Redo the last move");
       mi.setMnemonic(KeyEvent.VK_R);
-      mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.CTRL_MASK));
+      //mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.CTRL_MASK));
       mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK));
       mi.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
@@ -143,13 +198,26 @@ public class Mahjong extends JFrame{
       
       m.addSeparator();
       
-      mi = new JMenuItem("Find match");
+      mi = new JMenuItem("Find Match");
       mi.setToolTipText("Find matching tiles");
       mi.setMnemonic(KeyEvent.VK_F);
       mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.CTRL_MASK));
       mi.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
             mahjongPanel.findMatch();
+         }
+      });
+      m.add(mi);
+      
+      m.addSeparator();
+      
+      mi = new JMenuItem("Review");
+      mi.setToolTipText("Review removed tiles");
+      mi.setMnemonic(KeyEvent.VK_V);
+      mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, ActionEvent.CTRL_MASK));
+      mi.addActionListener(new ActionListener(){
+         public void actionPerformed(ActionEvent e){
+            mahjongPanel.review();
          }
       });
       m.add(mi);
@@ -172,15 +240,15 @@ public class Mahjong extends JFrame{
       m.setMnemonic(KeyEvent.VK_H);
       
       mi = new JMenuItem("Operation");
-      mi.setToolTipText("Undo the last move");
+      mi.setToolTipText("Learn how to operate the game");
       mi.setMnemonic(KeyEvent.VK_O);
       mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
       mi.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
-            //mahjongPanel.undo();
+            mahjongPanel.help("help/operation.html");
          }
       });
-      mi.setEnabled(false);
+      //mi.setEnabled(false);
       m.add(mi);
       
       mi = new JMenuItem("Game Rules");
@@ -189,17 +257,23 @@ public class Mahjong extends JFrame{
       mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, ActionEvent.SHIFT_MASK));
       mi.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
-            //mahjongPanel.undo();
+            mahjongPanel.help("help/rules.html");
          }
       });
-      mi.setEnabled(false);
+      //mi.setEnabled(false);
       m.add(mi);
       
       menuBar.add(m);
       
+      //Separator
+      /*m = new JMenu(" ");
+      m.setEnabled(false);
+      menuBar.add(m);*/
+      
       //Debug menu
       m = new JMenu("Debug");
       m.setMnemonic(KeyEvent.VK_D);
+      debugMenu = m;
       
       mi = new JCheckBoxMenuItem("Enforce Rules");
       mi.setToolTipText("Enforce Rules");
@@ -239,18 +313,43 @@ public class Mahjong extends JFrame{
       mi.setSelected(debug);
       m.add(mi);
       
-      /*m.addSeparator();
+      m.addSeparator();
       
       mi = new JMenuItem("Solve");
-      mi.setToolTipText("Solve");
+      mi.setToolTipText("Attempt to solve the game");
       mi.setMnemonic(KeyEvent.VK_S);
-      mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F12, 0));
+      mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SEMICOLON, ActionEvent.CTRL_MASK));
       mi.addActionListener(new ActionListener(){
          public void actionPerformed(ActionEvent e){
             mahjongPanel.solve(true);
          }
       });
-      m.add(mi);*/
+      m.add(mi);
+      
+      mi = new JMenuItem("Solvable Game");
+      mi.setToolTipText("Play a new game which is guaranteed to be solvable");
+      mi.setMnemonic(KeyEvent.VK_G);
+      mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK));
+      mi.addActionListener(new ActionListener(){
+         public void actionPerformed(ActionEvent e){
+            mahjongPanel.newSolvableGame();
+         }
+      });
+      m.add(mi);
+      
+      m.addSeparator();
+      
+      mi = new JMenuItem("Fireworks");
+      mi.setToolTipText("Start a fireworks display");
+      mi.setMnemonic(KeyEvent.VK_F);
+      mi.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SEMICOLON, ActionEvent.CTRL_MASK | ActionEvent.SHIFT_MASK));
+      mi.addActionListener(new ActionListener(){
+         public void actionPerformed(ActionEvent e){
+            mahjongPanel.hideAll();
+            mahjongPanel.fireworks();
+         }
+      });
+      m.add(mi);
       
       menuBar.add(m);
       
@@ -258,6 +357,7 @@ public class Mahjong extends JFrame{
       setJMenuBar(menuBar);
       setLookAndFeel();
       pack();
+      setMinimumSize(getSize());
       center();
       setVisible(true);
    }
@@ -273,12 +373,13 @@ public class Mahjong extends JFrame{
        *setLocation(x, y)
        */
       
-      long seed = System.currentTimeMillis() % 100000;
+      long start, time, seed = System.currentTimeMillis() % 100000;
       ArrayList<Tile> tiles = getTiles(seed);
       Stack<Tile> undoStack = new Stack<>();
       Stack<Tile> redoStack = new Stack<>();
       Image img = new ImageIcon(getClass().getResource("images/dragon_bg.png")).getImage();
-      String message = "";
+      Fireworks fireworksDisplay = new Fireworks(this);
+      PlayClip tileRemovedSound = new PlayClip("audio/stone-scraping.wav");
       
       public MahjongPanel(){
          setLayout(null);
@@ -289,6 +390,12 @@ public class Mahjong extends JFrame{
          
          initGame();
          
+         new java.util.Timer().scheduleAtFixedRate(new TimerTask(){
+            public void run(){
+               repaint();
+            }
+         }, 0, 1000);
+         
          repaint();
          revalidate();
          //Collections.shuffle(List<T>, Random)
@@ -297,9 +404,38 @@ public class Mahjong extends JFrame{
       
       public void paintComponent(Graphics g){
          super.paintComponent(g);
-         g.drawImage(img, (getWidth() - img.getWidth(null)) / 2, (getHeight() - img.getHeight(null)) / 2, null);
-         g.drawString("" + seed, 8, 16);
-         g.drawString(message, 8, 32);
+         
+         if(!fireworks)
+            g.drawImage(img, (getWidth() - img.getWidth(null)) / 2, (getHeight() - img.getHeight(null)) / 2, null);
+         
+         g.setColor(fireworks ? Color.LIGHT_GRAY : Color.BLACK);
+         
+         String message = "", clock = "";
+         
+         if(!tournament)
+            g.drawString("\u2116 " + seed, 8, 16);
+         
+         if(!hasTiles())
+            message = "Congratulations";
+         else if(!hasMatch())
+            message = "Game Over";
+         else
+            time = (System.currentTimeMillis() - start) / 1000;
+         
+         if(time < 3600)
+            clock = String.format("%d:%02d", (time / 60) % 60, time % 60);
+         else if(time < 86400)
+            clock = String.format("%d:%02d:%02d", (time / 3600) % 24, (time / 60) % 60, time % 60);
+         else if(time < 31556952)
+            clock = String.format("%d-%d:%02d:%02d" + clock, time / 86400, (time / 3600) % 24, (time / 60) % 60, time % 60);
+         else
+            clock = String.format("%d-%d-%d:%02d:%02d" + clock, time / 31556952, time % 31556952 / 86400, (time / 3600) % 24, (time / 60) % 60, time % 60);
+         
+         g.drawString(clock, 8, tournament ? 16 : 32);
+         //g.drawString(String.format("%d:%02d", time / 60, time % 60), 8, 32);
+         g.drawString(undoStack.size() + "/144", 8, tournament ? 32 : 48);
+         //g.drawString(String.format("%d/144 (%.1f%%)", undoStack.size(), undoStack.size() / 1.44), 8, 48);
+         g.drawString(message, 8, tournament ? 48 : 64);
       }
       
       public void initGame(){
@@ -308,7 +444,9 @@ public class Mahjong extends JFrame{
          int layer = -128;
          
          removeAll();
-         message = "";
+         start = System.currentTimeMillis();
+         stopFireworks();
+         setBackground(new Color(254, 208, 45));
          
          for(Tile t : tiles){
             if(t.layer != layer){
@@ -352,7 +490,7 @@ public class Mahjong extends JFrame{
             undoMI.setEnabled(false);
          
          redoMI.setEnabled(true);
-         message = "";
+         stopFireworks();
          
          revalidate();
          repaint();
@@ -382,12 +520,12 @@ public class Mahjong extends JFrame{
          undoMI.setEnabled(true);
          
          if(!hasTiles()){
-            message = "Congratulations";
             repaint();
             fireworks();
-         }else if(!hasMatch()){
-            message = "Game Over";
          }
+         
+         if(sound)
+            tileRemovedSound.play();
          
          revalidate();
          repaint();
@@ -399,23 +537,23 @@ public class Mahjong extends JFrame{
                for(Tile tt : tiles){
                   if(t.isVisible() && t.isOpen() && tt.isVisible() && tt.isOpen() && t != tt && t.matches(tt)){
                      t.setVisible(false);
-                     undoStack.add(t);
+                     undoStack.push(t);
                      tt.setVisible(false);
-                     undoStack.add(tt);
+                     undoStack.push(tt);
                      undoMI.setEnabled(true);
+                     
+                     if(calledByUser && sound)
+                        tileRemovedSound.play();
                   }
                }
             }
          }
          
          if(!hasTiles()){
-            message = "Congratulations";
             repaint();
             
             if(calledByUser)
                fireworks();
-         }else{
-            message = "Game Over";
          }
          
          repaint();
@@ -508,7 +646,9 @@ public class Mahjong extends JFrame{
          redoStack.clear();
          redoMI.setEnabled(false);
          
-         message = "";
+         stopFireworks();
+         
+         initGame();
          
          revalidate();
          repaint();
@@ -580,8 +720,70 @@ public class Mahjong extends JFrame{
          repaint();
       }
       
+      public void hideAll(){
+         for(Tile t : tiles)
+            t.setVisible(false);
+      }
+      
+      public int getScore(){
+         return undoStack.size();
+      }
+      
       public void fireworks(){
          //TODO: Fireworks display
+         fireworks = true;
+         fireworksDisplay.setExplosions(0, 1000);
+         fireworksDisplay.fire();
+         
+         /*try{
+            Thread.sleep(100000);
+            fw.stop();
+         }catch(InterruptedException ie){}*/
+         
+         /*new java.util.Timer().schedule(new TimerTask(){
+            public void run(){
+               try{
+                  Thread.sleep(300000);
+               }catch(InterruptedException ex){
+               }finally{
+                  //stopFireworks();
+                  newGame();
+               }
+            }
+         }, 0);*/
+      }
+      
+      public void stopFireworks(){
+         fireworks = false;
+         
+         try{
+            fireworksDisplay.stop();
+         }catch(NullPointerException ex){
+            //ex.printStackTrace();
+         }
+      }
+      
+      public void setSound(boolean sound){
+         fireworksDisplay.setSound(sound);
+      }
+      
+      public void review(){
+         if(undoStack.size() > 0){
+            JScrollPane scrollPane = new JScrollPane(new ReviewPanel(undoStack),
+               JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            scrollPane.setPreferredSize(new Dimension(192, 325));
+            scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+            
+            JOptionPane.showConfirmDialog(this, scrollPane,
+               "Review", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+         }else{
+            JOptionPane.showConfirmDialog(this, "No tiles have been removed from the board yet.",
+               "Review", JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE);
+         }
+      }
+      
+      public void help(String file){
+         new Help(file, "Help").display();
       }
       
       //Listeners
@@ -595,11 +797,12 @@ public class Mahjong extends JFrame{
          if(debug){
             src.setVisible(false);
             undoStack.push(src);
+            ///historyPanel.add(src);
             undoMI.setEnabled(true);
             redoStack.clear();
             redoMI.setEnabled(false);
             repaint();
-         }else if((e.getModifiers() & InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK){
+         }else if((e.getModifiers() & InputEvent.BUTTON3_MASK) == InputEvent.BUTTON3_MASK && !tournament){
             for(Tile t: tiles){
                t.setHighlighted(false);
                t.setSelected(false);
@@ -623,8 +826,10 @@ public class Mahjong extends JFrame{
                   //Remove the tile from the board
                   src.setVisible(false);
                   undoStack.push(src);
+                  ///historyPanel.add(src);
                   selected.setVisible(false);
                   undoStack.push(selected);
+                  ///historyPanel.add(selected);
                   selected.setSelected(false);
                   selected = null;
                   undoMI.setEnabled(!tournament);
@@ -635,12 +840,12 @@ public class Mahjong extends JFrame{
                      t.setHighlighted(false);
                   
                   if(!hasTiles()){
-                     message = "Congratulations";
                      repaint();
                      fireworks();
-                  }else if(!hasMatch()){
-                     message = "Game Over";
                   }
+                  
+                  if(sound)
+                     tileRemovedSound.play();
                   
                   revalidate();
                   repaint();
@@ -672,6 +877,20 @@ public class Mahjong extends JFrame{
       public void mouseClicked(MouseEvent e){
       }
    }
+   
+   /*public class HistoryPanel extends JPanel{
+      public HistoryPanel(){
+         setBackground(new Color(254, 208, 45));
+         setPreferredSize(new Dimension(Tile.WIDTH * 3, 16));
+      }
+      
+      public Component add(Component comp){
+         super.add(comp.clone());
+         revalidate();
+         repaint();
+         return comp;
+      }
+   }*/
    
    protected ArrayList<Tile> getTiles(long seed){
       ArrayList<Tile> tiles = new ArrayList<Tile>();
@@ -917,6 +1136,11 @@ public class Mahjong extends JFrame{
       return layout;
    }
    
+   public void exit(){
+      if(!mahjongPanel.hasMatch() || JOptionPane.showConfirmDialog(this, "Are you sure you want to exit?", "Exit", JOptionPane.YES_NO_OPTION) == JOptionPane.OK_OPTION)
+         System.exit(0);
+   }
+   
    public void center(){
       Point centerPoint = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
       setLocation(centerPoint.x - getWidth() / 2, centerPoint.y - getHeight() / 2);
@@ -938,6 +1162,8 @@ public class Mahjong extends JFrame{
    }
    
    public static void main(String[] args){
-      new Mahjong();
+      new Mahjong(args.length != 0 && args[0].toLowerCase().equals("debug"));
+      //new Mahjong(true);
+      //new Mahjong();
    }
 }

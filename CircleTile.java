@@ -1,9 +1,10 @@
 /*Jeremy Johnson
  *CS 3230 - TR 9:30 AM
- *Lab 7: CircleTile.java
+ *Lab 8: CircleTile.java
  */
 
 import java.awt.*;
+import java.awt.image.*;
 import javax.swing.*;
 
 public class CircleTile extends RankTile{
@@ -129,6 +130,15 @@ public class CircleTile extends RankTile{
       return "Circle " + rank;
    }
    
+   public static Image createIcon(){
+      BufferedImage img = new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB);
+      Graphics2D g2d = img.createGraphics();
+      
+      new Pancake(32, 32, 32).draw(g2d);
+      
+      return img;
+   }
+   
    public static void main(String[] args){
       JFrame frame = new JFrame();
       
@@ -150,7 +160,7 @@ public class CircleTile extends RankTile{
       frame.setVisible(true);
    }
    
-   protected class Circle{
+   protected static class Circle{
       protected Color color;
       protected int x, y, radius;
       
@@ -181,7 +191,7 @@ public class CircleTile extends RankTile{
       }
    }
    
-   protected class Pancake extends Circle{
+   protected static class Pancake extends Circle{
       protected int radius;
       
       public Pancake(int x, int y, int radius){
